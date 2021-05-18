@@ -9,7 +9,9 @@ This folder contains  assigmnent 2 for the course *Visual Analytics*
 Colours constitute key markers for the visual system when faced with tasks such as object recognition and memory consolidation (Wichmann and Sharpe, 2002). Furthermore, colours can be numerically represented in e.g., a 3D RGB colour space. Thus, by being both relevant neural features and computationally manageable, colours are an obvious feature to focus on when performing a simple analysis on visual data. As an example, image similarity can be analysed by calculating the differences in the colour composition between two different images. To conduct such an analysis, the various colour nuances present in an must be quantified using a 3D colour histogram. Such a histogram represents the distribution of colour present in an image. <br>
 <br>
 For this assignment, we were provided with a data set consisting of images of 17 different common British flowers. The data set contains 80 images for each category.  We were then asked to compare the 3D colour histogram of a self-chosen target image with each of the other images in the corpus one-by-on using chi square distance as a similarity measure. More specifically, the task was to produce a script that, for a given input image, outputs a single .csv file containing a column for the filenames of the compared images and a column with the corresponding distance scores. Lastly, the script should print out the filename of the image found to be most similar to the input target image.
-
+<br>
+<br>
+The data set contains 80 images for each category. Note that due to storage constraint, only 250 images have been uploaded to GitHub. You are free to download the full dataset locally using this link: https://www.robots.ox.ac.uk/~vgg/data/flowers/17/
 
 # Usage
 See *General Instruction* in the home folder of the repository for instruction on how to clone the repo locally.
@@ -87,6 +89,15 @@ This image has a chi square distance of 1242
 <br>
 <br>
 From this example run, it is apparent that the algorithm to a certain degree captures similarity between images; the target image and the image with the lowest chi square value both depict yellow flowers photographed with a mixed green/brown background. However, color histograms only capture the proportion of the number of colours in an image and do not account for the spatial location of the colors. The target image comprises several flowers and the flower visible in image_0597 - though yellow - is clearly not of the same species. Hence, the method will often be insufficient to solve a more complex task like object recognition and serves better when used in combination with other visual analysis approaches.
+
+# References
+- Bradski, G. (2000). The OpenCV Library. Dr. Dobb’s Journal of Software Tools.
+<br>
+<br>
+- McKinney, W., & others. (2010). Data structures for statistical computing in python. In Proceedings of the 9th Python in Science Conference (Vol. 445, pp. 51–56).
+<br>
+<br>
+- Wichmann, F. A., Sharpe, L. T., & Gegenfurtner, K. R. (2002). The contributions of color to recognition memory for natural scenes. Journal of Experimental Psychology: Learning, Memory, and Cognition, 28(3), 509.
 
 
 # License
