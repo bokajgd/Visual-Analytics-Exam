@@ -16,7 +16,7 @@ from models.model_utils.utils import plot_coefs
 # Defining logistic regression in a single function
 def lr_mnist(pen, tol):
     # Setting model output directory 
-    model_out_dir = Path.cwd() / 'W7-Image-Classification' / 'model_out' 
+    model_out_dir = Path.cwd() / 'A4-Image-Classification' / 'output' 
 
     X, y = fetch_openml('mnist_784', version=1, return_X_y=True) # Load data
     
