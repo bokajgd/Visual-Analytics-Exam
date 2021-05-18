@@ -380,204 +380,275 @@ class MainApp(tk.Tk):
         cm = models.lr_mnist.lr_mnist(pen, tol) 
         
         # Create panel showing prediction results
-        log_results_panel = tk.Label(self, text =  cm, font=('calibre',9)) 
+        log_results_panel = tk.Label(self, text =  cm, font=('calibre',9), background='white') 
 
         log_results_panel.place(x=310, y=154)
 
-        # Plot graph
+        # Plot visualisations of most important inputs for each class
         lr_graph = Image.open(Path.cwd() / 'A4-Image-Classification' / 'output' /  f"{pen}-penalty-{tol}-tol-nodes-LR-viz.png")
+
         lr_graph = lr_graph.resize((370, 235))
+
         lr_graph = ImageTk.PhotoImage(lr_graph)
+
         lr_graph_panel = tk.Label(self, image=lr_graph)
+
         lr_graph_panel.image = lr_graph
-        lr_graph_panel.place(x=525, y=130) # Place label on frame
 
-        self.reset_lr() # Create reset button
+        # Place label on frame
+        lr_graph_panel.place(x=525, y=130)
 
-class StartPage(tk.Frame): # Defining a class for the start page inheriting functions from tk.Frame
-    def __init__(self, parent, controller): # have the class self-initiate functions from itself and parent-class
-        tk.Frame.__init__(self, parent)# initiate a frame for the page
+        # Run reset_lr function
+        self.reset_lr() 
 
-        photo = tk.PhotoImage(file = graphics_dir / "bgHome.gif") # add a background image
-        bg = tk.Label(self, image=photo) # create a label containing the specified photo
-        bg.place(x=0, y=0, relwidth=1, relheight=1) # placing the bg filling the entire frame
-        bg.image = photo # using the .image function of tkiner to call the background as the photo
+#-----# Defing StartPage class #-----#
 
+# Defining a class for the start page inheriting functions from tk.Frame
+class StartPage(tk.Frame):
+
+     # Have the class self-initiate functions from itself and parent-class
+    def __init__(self, parent, controller):
+        
+        # Initiate a frame for the page
+        tk.Frame.__init__(self, parent)
+
+        # Add a background image
+        photo = tk.PhotoImage(file = graphics_dir / "bgHome.gif") 
+
+        # Create a label containing the specified photo
+        bg = tk.Label(self, image=photo)
+
+        # Placing the bg filling the entire frame
+        bg.place(x=0, y=0, relwidth=1, relheight=1) 
+
+        # Use the .image function of tkiner to call the background as the photo
+        bg.image = photo 
+
+        # Adding button to access the Log Reg page
         NNmodelButton = tk.Button(self, text="Logistic Regression", font=("Arial Bold", 13),
                         foreground='#326DB2', command=lambda : controller.showFrame(LogReg))
-                                # adding button to access the ModelPage
-        NNmodelButton.place(relx=0.2, rely=0.8, height=40, width=170) # placing the button on the page
+                                
+        NNmodelButton.place(relx=0.2, rely=0.8, height=40, width=170)
 
+        # Adding button to access the CNN page
         LRmodelButton = tk.Button(self, text="Neural Network", font=("Arial Bold", 13),
                         foreground='#326DB2', command=lambda : controller.showFrame(CNN))
-                                # adding button to access the InfoPage
-        LRmodelButton.place(relx=0.64, rely=0.8, height=40, width=170) # placing the button on the page
+                                
+        LRmodelButton.place(relx=0.64, rely=0.8, height=40, width=170)
 
+#-----# Defining CNN page class #-----#
 
-class CNN(tk.Frame): # define a class for running the model on personally chosen picture
-    def __init__(self, parent, controller): # have the class self-initiate functions from itself and parent-class as well as controller
+# Defining class for page for training cnns
+class CNN(tk.Frame):
+
+    def __init__(self, parent, controller): 
 
         global trainLogReg
         global CNNresetButton
 
-        tk.Frame.__init__(self, parent) # initiate a frame for the page
+        tk.Frame.__init__(self, parent) 
 
-        background = tk.PhotoImage(file= graphics_dir / "bgStandard.gif") # set background
-        bg = tk.Label(self, image=background) # defining bg as a label using defined image
-        bg.place(x=0, y=0, relwidth=1, relheight=1) # placing the image as background
-        bg.image = background # using the .image function of tkiner to call the background as the photo
+         # Set background
+        background = tk.PhotoImage(file= graphics_dir / "bgStandard.gif")
+        bg = tk.Label(self, image=background)
+        bg.place(x=0, y=0, relwidth=1, relheight=1)
+        bg.image = background
 
+        # Add a label as header
         label = tk.Label(self, text="Convolutional Neural Network", relief="flat", background = "#42669C",
-                        foreground = 'white', width = 450, height = 2, font=("Arial Bold", 28), highlightcolor="white") # add a label as header
-        label.place(relx=0.286, rely=0.08, width = 450) # place label and align it at the center of main-app
+                        foreground = 'white', width = 450, height = 2, font=("Arial Bold", 28), highlightcolor="white") 
+        
+        # Place label and align it at the center 
+        label.place(relx=0.286, rely=0.08, width = 450) 
 
-        lowerFrame = tk.Frame(self, bg='white', bd=10, relief='raised', borderwidth = 5) #  adding white frame in middle of frame
-        lowerFrame.place(relx=0.5, rely=0.25, relwidth=0.8, relheight=0.5, anchor='n') # placing the frame
+        # Adding white frame in middle of frame
+        lowerFrame = tk.Frame(self, bg='white', bd=10, relief='raised', borderwidth = 5) 
+
+        lowerFrame.place(relx=0.5, rely=0.25, relwidth=0.8, relheight=0.5, anchor='n')
 
         # Add dropdown
+        # Number of possible layers in fully connected part
         layer_choices = [1, 2, 3]
+
         layers_choice = tk.StringVar(self)
+
+        # Setting 1 as default number of fc layers
         default = layer_choices[0]
+
         choose_n_layers = ttk.OptionMenu(self, layers_choice, default, *layer_choices)
         
         # Add entry box
         nodes_choice = tk.StringVar(self)
+        
+        # Entry box for defining number of nodes in each layer e.g. 8,4 (number of integers must have same length as number of layers chosen)
         choose_n_nodes = tk.Entry(self, textvariable = nodes_choice, font=('calibre',10,'normal'), background='white')
          
         # Add labels
         dropdown_label = tk.Label(self, text = 'Choose number of layers', font=('calibre',10, 'bold'), background='white')
+
         entry_label = tk.Label(self, text = 'Choose number of nodes', font=('calibre',10, 'bold'), background='white')
 
         # Placing stuff
         dropdown_label.place(rely = 0.38, relx = 0.12)
+
         choose_n_layers.place(rely = 0.42, relx = 0.12)
+
         entry_label.place(rely = 0.53, relx = 0.12)
+
         choose_n_nodes.place(rely = 0.57, relx = 0.12)
 
+        # Adding buttons
         trainModel = tk.Button(self, text="Train and Evaluate", font=("Arial Bold", 13),
                                foreground='#326DB2', command=lambda : [controller.trainCNN(layers_choice, choose_n_nodes)])
-                                # add button for adding and opening images
-        trainModel.place(relx=0.21, rely=0.8, height=40, width=170) # place button on frame
+                                
+        trainModel.place(relx=0.21, rely=0.8, height=40, width=170) 
 
         CNNstartButton = tk.Button(self, text="Start Page", font=("Arial Bold", 13),
                                    foreground='#326DB2', command=lambda : [controller.showFrame(StartPage), controller.cnn_replace(results_panel, nn_graph_panel, layers_choice, default, nodes_choice)])
-                                # add button for accessing StartPage and removing image
-        CNNstartButton.place(relx=0.62, rely=0.8, height=40, width=170) # place button on frame
+
+        CNNstartButton.place(relx=0.62, rely=0.8, height=40, width=170) 
 
         CNNresetButton = tk.Button(self, text="Reset", font=("Arial Bold", 13),
                                    foreground='#326DB2', command=lambda : [controller.cnn_replace(results_panel, nn_graph_panel, layers_choice, default, nodes_choice)])
-                                # add button for running model and producing prediction            
 
         CNNclassImageButton = tk.Button(self, text="Classify New Image", font=("Arial Bold", 13),
                                          foreground='#326DB2', command=lambda : [controller.showFrame(CNNclassImage), controller.cnn_replace(results_panel, nn_graph_panel, layers_choice, default, nodes_choice)])
-                    # adding button to access the InfoPage
-        CNNclassImageButton.place(relx=0.414, rely=0.8, height=40, width=170) # placing the button on the page
 
+        CNNclassImageButton.place(relx=0.414, rely=0.8, height=40, width=170)
 
-class LogReg(tk.Frame): # define a class for running the model on personally chosen picture
-    def __init__(self, parent, controller): # have the class self-initiate functions from itself and parent-class as well as controller
+#-----# Defining Log Reg page class #-----#
+
+# Defining class for page for training a logistic regression
+class LogReg(tk.Frame): 
+
+    def __init__(self, parent, controller):
 
         global trainModel
         global LRresetButton
 
-        tk.Frame.__init__(self, parent) # initiate a frame for the page
+        tk.Frame.__init__(self, parent)
 
-        background = tk.PhotoImage(file= graphics_dir / "bgStandard.gif") # set background
-        bg = tk.Label(self, image=background) # defining bg as a label using defined image
-        bg.place(x=0, y=0, relwidth=1, relheight=1) # placing the image as background
-        bg.image = background # using the .image function of tkiner to call the background as the photo
+        # Set background
+        background = tk.PhotoImage(file= graphics_dir / "bgStandard.gif") 
 
+        bg = tk.Label(self, image=background)
+
+        bg.place(x=0, y=0, relwidth=1, relheight=1)
+
+        bg.image = background
+
+        # Addiing header
         label = tk.Label(self, text="Logistic Regression", relief="flat", background = "#42669C",
-                        foreground = 'white', width = 450, height = 2, font=("Arial Bold", 28), highlightcolor="white") # add a label as header
-        label.place(relx=0.287, rely=0.08, width = 450) # place label and align it at the center of main-app
+                        foreground = 'white', width = 450, height = 2, font=("Arial Bold", 28), highlightcolor="white")
+        
+        label.place(relx=0.287, rely=0.08, width = 450)
 
-        lowerFrame = tk.Frame(self, bg='white', bd=10, relief='raised', borderwidth = 5) #  adding white frame in middle of frame
-        lowerFrame.place(relx=0.5, rely=0.25, relwidth=0.8, relheight=0.5, anchor='n') # placing the frame
+        # Adding white frame in center
+        lowerFrame = tk.Frame(self, bg='white', bd=10, relief='raised', borderwidth = 5) 
+
+        lowerFrame.place(relx=0.5, rely=0.25, relwidth=0.8, relheight=0.5, anchor='n') 
 
         # Add dropdown
+        # Different types of penalty
         pen_choices = ['l1', 'l2', 'elasticnet', 'none']
+
         pen_choice = tk.StringVar(self)
+
         default = pen_choices[0]
 
         choose_pen = ttk.OptionMenu(self, pen_choice, default, *pen_choices)
         
-        # Add entry box
+        # Add entry box for tolerance level
         tol_choice = tk.StringVar(self)
+
         choose_tol = tk.Entry(self, textvariable = tol_choice, font=('calibre',10,'normal'), background='white')
 
         # Add labels
         dropdown_label = tk.Label(self, text = 'Choose penalty', font=('calibre',12, 'bold'), background='white')
+
         entry_label = tk.Label(self, text = 'Choose tolerance', font=('calibre',12, 'bold'), background='white')
 
         # Placing stuff
         dropdown_label.place(rely = 0.38, relx = 0.12)
+
         choose_pen.place(rely = 0.42, relx = 0.12)
+
         entry_label.place(rely = 0.53, relx = 0.12)
+
         choose_tol.place(rely = 0.57, relx = 0.12)
 
+        # Adding buttons
         trainModel = tk.Button(self, text="Train and Evaluate", font=("Arial Bold", 13),
                         foreground='#326DB2', command=lambda : [controller.trainLogReg(pen_choice, choose_tol)])
-                                # add button for adding and opening images
-        trainModel.place(relx=0.21, rely=0.8, height=40, width=170) # place button on frame
+
+        trainModel.place(relx=0.21, rely=0.8, height=40, width=170)
 
         LRstartButton = tk.Button(self, text="Start Page", font=("Arial Bold", 13),
                                    foreground='#326DB2', command=lambda : [controller.showFrame(StartPage), controller.lr_replace(log_results_panel, lr_graph_panel, pen_choice, default, tol_choice)])
-                                # add button for accessing StartPage and removing image
-        LRstartButton.place(relx=0.59, rely=0.8, height=40, width=170) # place button on frame
+
+        LRstartButton.place(relx=0.59, rely=0.8, height=40, width=170)
 
         LRresetButton = tk.Button(self, text="Reset", font=("Arial Bold", 13),
                                   foreground='#326DB2', command=lambda : [controller.lr_replace(log_results_panel, lr_graph_panel, pen_choice, default, tol_choice)])
-                                # add button for running model and producing prediction
 
-class CNNclassImage(tk.Frame): # define a class for classifying new image
-    def __init__(self, parent, controller): # have the class self-initiate functions from itself and parent-class as well as controller
+#-----# Defining for classifying new image using CNN #-----#
+
+# Defining class for page for classifying self chosen image using the pre-trained cnn
+class CNNclassImage(tk.Frame):
+    def __init__(self, parent, controller): 
        
         global chooseImg
         global CNNclassResetButton
 
-        tk.Frame.__init__(self, parent) # initiate a frame for the page
+        tk.Frame.__init__(self, parent) 
 
-        background = tk.PhotoImage(file=graphics_dir / "bgStandard.gif") # set background
-        bg = tk.Label(self, image=background) # defining bg as a label using defined image
-        bg.place(x=0, y=0, relwidth=1, relheight=1) # placing the image as background
-        bg.image = background # using the .image function of tkiner to call the background as the photo
+        # Set background
+        background = tk.PhotoImage(file=graphics_dir / "bgStandard.gif") 
+        bg = tk.Label(self, image=background)
+        bg.place(x=0, y=0, relwidth=1, relheight=1)
+        bg.image = background
 
+        # Adding header
         label = tk.Label(self, text="Classify New Image", relief="flat", background = "#42669C",
-                        foreground = 'white', width = 450, height = 2, font=("Arial Bold", 28), highlightcolor="white") # add a label as header
-        label.place(relx=0.32, rely=0.08, width = 350) # place label and align it at the center of main-app
+                        foreground = 'white', width = 450, height = 2, font=("Arial Bold", 28), highlightcolor="white")
+        label.place(relx=0.32, rely=0.08, width = 350)
 
-        lowerFrame = tk.Frame(self, bg='white', bd=10, relief='raised', borderwidth = 5) #  adding white frame in middle of frame
-        lowerFrame.place(relx=0.5, rely=0.25, relwidth=0.6, relheight=0.5, anchor='n') # placing the frame
+        # Adding white frame in middle of frame
+        lowerFrame = tk.Frame(self, bg='white', bd=10, relief='raised', borderwidth = 5) 
 
+        lowerFrame.place(relx=0.5, rely=0.25, relwidth=0.6, relheight=0.5, anchor='n')
+
+        # Adding buttons
         chooseImg = tk.Button(self, text="Choose Image", font=("Arial Bold", 13),
                                foreground='#326DB2', command=lambda : [controller.addImage(), controller.openImage()])
-                                # add button for adding and opening images
-        chooseImg.place(relx=0.20, rely=0.8, height=40, width=170) # place button on frame
+                                
+        chooseImg.place(relx=0.20, rely=0.8, height=40, width=170)
 
 
         classifyButton = tk.Button(self, text="Classify", font=("Arial Bold", 13),
                                    foreground='#326DB2', command=lambda : [controller.preprocess(file), controller.runModel(n_layers, n_nodes), 
                                                 controller.predCalculation(prediction), controller.reset_cnn_classification()])
-                                # add button for running model and producing prediction
-        classifyButton.place(relx = 0.41, rely=0.8, height=40, width=170) # place button on frame
+                                
+        classifyButton.place(relx = 0.41, rely=0.8, height=40, width=170)
 
         CNNbackButton = tk.Button(self, text="Go Back", font=("Arial Bold", 13),
                                   foreground='#326DB2', command=lambda : [controller.showFrame(CNN), 
                                                   controller.cnn_class_remove_predictions(prediction_bar_plot_panel, predictionLabel),
                                                   controller.cnn_class_remove_image(yourImgLabel, panel),
                                                   controller.cnn_class_replace_chooseImage()])
-                                # add button for accessing StartPage and removing image
-        CNNbackButton.place(relx=0.63, rely=0.8, height=40, width=170) # place button on frame
+
+        CNNbackButton.place(relx=0.63, rely=0.8, height=40, width=170)
 
         CNNclassResetButton = tk.Button(self, text="Reset", font=("Arial Bold", 13),
                                         foreground='#326DB2', command=lambda : [controller.removeImage(), controller.removeText(), 
                                           controller.cnn_class_remove_predictions(prediction_bar_plot_panel, predictionLabel),
                                           controller.cnn_class_remove_image(yourImgLabel, panel),
                                           controller.cnn_class_replace_chooseImage()])
-                        # add button for running model and producing prediction
- 
-app = MainApp() # define variable 'app' as the MainApp() for running tkinter window
-app.mainloop() # call the mainloop() function on app to activate all defined frames
 
+ # Define variable 'app' as the MainApp() for running tkinter window
+app = MainApp() 
+
+# Call the mainloop() function on app to activate all defined frames
+app.mainloop() 
 
 
