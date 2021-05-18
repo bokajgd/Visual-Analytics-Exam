@@ -82,9 +82,8 @@ This image has a chi square distance of 1242
 <br>
 
 ### Image_0001
-
-<img src="https://github.com/bokajgd/Visual-Analytics-Exam/blob/main/A2-Histogram-Comparisons/data/jpg/image_0001.jpg?raw=true" width="400", height="300"/>
-
+![](data/jpg/image_0001.jpg)
+### Image_0597
 ![](data/jpg/image_0597.jpg)
 <br>
 From this example run, it is apparent that the algorithm to a certain degree captures similarity between images; the target image and the image with the lowest chi square value both depict yellow flowers photographed with a mixed green/brown background. However, color histograms only capture the proportion of the number of colours in an image and do not account for the spatial location of the colors. The target image comprises several flowers and the flower visible in image_0597 - though yellow - is clearly not of the same species. Hence, the method will often be insufficient to solve a more complex task like object recognition and serves better when used in combination with other visual analysis approaches.
