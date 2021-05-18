@@ -8,4 +8,4 @@ pip install --upgrade pip
 
 test -f requirements.txt && pip install -r requirements.txt
 
-echo "build $VENVNAME"
+echo "finished building $VENVNAME"
