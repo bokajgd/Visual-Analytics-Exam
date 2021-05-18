@@ -83,7 +83,7 @@ This image has a chi square distance of 1242
 
 ### Image_0001
 
-<img src="data/jpg/image_0001.jpg" width="400", height="300"/>
+<img src="https://github.com/bokajgd/Visual-Analytics-Exam/blob/main/A2-Histogram-Comparisons/data/jpg/image_0001.jpg?raw=true" width="400", height="300"/>
 
 ![](data/jpg/image_0597.jpg)
 <br>
