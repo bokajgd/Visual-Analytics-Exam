@@ -79,8 +79,8 @@ python src/A2-Histogram-Comparison.py -ti image_0001
 The most similar image is image_0597.jpg
 This image has a chi square distance of 1242
 ```
-![](data/jpg/image_0001.png)
-![](data/jpg/image_0597.png)
+![](data/jpg/image_0001.jpg)
+![](data/jpg/image_0597.jpg)
 <br>
 From this example run, it is apparent that the algorithm to a certain degree captures similarity between images; the target image and the image with the lowest chi square value both depict yellow flowers photographed with a mixed green/brown background. However, color histograms only capture the proportion of the number of colours in an image and do not account for the spatial location of the colors. The target image comprises several flowers and the flower visible in image_0597 - though yellow - is clearly not of the same species. Hence, the method will often be insufficient to solve a more complex task like object recognition and serves better when used in combination with other visual analysis approaches.
 
