@@ -391,7 +391,7 @@ class MainApp(tk.Tk):
 
         lr_graph = ImageTk.PhotoImage(lr_graph)
 
-        lr_graph_panel = tk.Label(self, image=lr_graph)
+        lr_graph_panel = tk.Label(self, image=lr_graph, background="white")
 
         lr_graph_panel.image = lr_graph
 
