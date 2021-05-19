@@ -5,7 +5,7 @@ import argparse
 
 #-----# Project desctiption #-----#
 
-# Basic image processing using python
+# Object segmentation using edge detection
 '''
 - Draw a green rectangular box to show a region of interest (ROI) around the main body of text in the middle of the image. Save this as image_with_ROI.jpg.
 - Crop the original image to create a new image containing only the ROI in the rectangle. Save this as image_cropped.jpg.
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     # Creating argument variable for target image
     parser.add_argument('-inp',
-                        metavar="--input",
+                        metavar="--input_image",
                         type=str,
                         help=
                         "[DESCRIPTION] Name of the file of the input image \n"

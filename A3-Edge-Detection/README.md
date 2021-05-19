@@ -9,6 +9,7 @@ This folder contains  assigmnent 3 for the course *Visual Analytics*
 Edge detection refers to the notion of identifying boundary points in an image where the light or colour intensity changes drastically (Davis, 1975). For this assignment, we aim to utilize edge detection algorithms to perform object segmentation/detection on an image. The end goal, thus, is to identify and draw contours around perceptually salient segments of an image. Once all separate objects in an image have been identified, they can e.g., be classified using an object recognition algorithm. 
 <br> <br>
 More specifically, we were provided with a large image of a piece of text engraved onto the Jefferson memorial. The image can be found by clicking this link: <br> https://upload.wikimedia.org/wikipedia/commons/f/f4/%22We_Hold_These_Truths%22_at_Jefferson_Memorial_IMG_4729.JPG <br>
+<br>
  The purpose is to detect and draw contours around each specific letter and language-like object (e.g. punctuation) in the image. The tasks were as follows (taken directly from assignment description): <br>
 •	Draw a green rectangular box to show a region of interest (ROI) around the main body of text in the middle of the image. Save this as **image_with_ROI.jpg**. <br>
 •	Crop the original image to create a new image containing only the ROI in the rectangle. Save this as **image_cropped.jpg**. <br>
