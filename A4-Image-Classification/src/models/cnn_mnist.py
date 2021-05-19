@@ -14,7 +14,7 @@ from models.model_utils.utils import draw_neural_net
 def cnn_mnist(n_layers, n_nodes):
 
     # Setting model output directory 
-    model_out_dir = Path.cwd() / 'A4-Image-Classification' / 'output' 
+    model_out_dir = Path.cwd() / 'output' 
 
     # Load data
     mnist = keras.datasets.mnist

@@ -8,16 +8,17 @@ from sklearn import metrics
 from sklearn.datasets import fetch_openml 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+
 
 # Import utility functions definied in utils.py
 from models.model_utils.utils import plot_coefs
+
 
 # Defining logistic regression in a single function
 def lr_mnist(pen, tol):
 
     # Setting model output directory 
-    model_out_dir = Path.cwd() / 'A4-Image-Classification' / 'output' 
+    model_out_dir = Path.cwd() / 'output' 
     
     # Load data
     X, y = fetch_openml('mnist_784', version=1, return_X_y=True) 

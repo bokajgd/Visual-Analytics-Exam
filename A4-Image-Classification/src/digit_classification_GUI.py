@@ -21,10 +21,14 @@ import matplotlib.pyplot as plt
 
 #-----# Description #-----#
 '''
+This script contain an interactive graphical user-interface coded in Python using tkinter which allows the user to player around 
+with hyperparameters and train and test various logistic regression and convolutional neural network-based digit classifiers.
+The app allows the user to upload an image from their computer and let their self-designed neural network predict which number 
+it believes to be depicted in the image.
 '''
 
 # Setting graphics directory
-graphics_dir = Path.cwd() / 'A4-Image-Classification' / 'graphics'
+graphics_dir = Path.cwd() / 'graphics'
 
 #-----# Defing main class #-----#
 
@@ -250,7 +254,7 @@ class MainApp(tk.Tk):
         global prediction
 
         # Defining model path
-        model_path = Path.cwd() / 'A4-Image-Classification' / 'output' / f"{n_layers}-dense-{n_nodes}-nodes-CNN.model"
+        model_path = Path.cwd() / 'output' / f"{n_layers}-dense-{n_nodes}-nodes-CNN.model"
 
         # Loading in the model from directory
         model = tf.keras.models.load_model(str(model_path)) 
@@ -280,7 +284,7 @@ class MainApp(tk.Tk):
         plt.xlabel("Class")
 
         # Call it 'latest-prediction.png'
-        plt.savefig(Path.cwd() / 'A4-Image-Classification' / 'output' / "latest-prediction.png")
+        plt.savefig(Path.cwd() / 'output' / "latest-prediction.png")
 
         # Get prediction 
         number_prediction = preds.index(max(preds))
@@ -298,7 +302,7 @@ class MainApp(tk.Tk):
 
         # Prininting bar plot showing model certainties 
         # Opening image that has just been created
-        prediction_bar_plot = Image.open(Path.cwd() / 'A4-Image-Classification' / 'output' / "latest-prediction.png") 
+        prediction_bar_plot = Image.open(Path.cwd() / 'output' / "latest-prediction.png") 
 
         prediction_bar_plot = prediction_bar_plot.resize((230, 145)) 
 
@@ -346,7 +350,7 @@ class MainApp(tk.Tk):
             results_panel.place(x=320, y=160)
 
             # Create and place network graph of the fully connected layers using hyperparameters as given by the users
-            nn_graph = Image.open(Path.cwd() / 'A4-Image-Classification' / 'output' / f"{n_layers}-dense-{n_nodes}-nodes-CNN-viz.png") 
+            nn_graph = Image.open(Path.cwd() / 'output' / f"{n_layers}-dense-{n_nodes}-nodes-CNN-viz.png") 
 
             nn_graph = nn_graph.resize((232, 232)) 
 
@@ -385,8 +389,8 @@ class MainApp(tk.Tk):
         log_results_panel.place(x=310, y=154)
 
         # Plot visualisations of most important inputs for each class
-        lr_graph = Image.open(Path.cwd() / 'A4-Image-Classification' / 'output' /  f"{pen}-penalty-{tol}-tol-nodes-LR-viz.png")
-
+        lr_graph = Image.open(Path.cwd() / 'output' /  f"{pen}-penalty-{tol}-tol-nodes-LR-viz.png")
+        
         lr_graph = lr_graph.resize((370, 235))
 
         lr_graph = ImageTk.PhotoImage(lr_graph)
@@ -396,7 +400,7 @@ class MainApp(tk.Tk):
         lr_graph_panel.image = lr_graph
 
         # Place label on frame
-        lr_graph_panel.place(x=525, y=130)
+        lr_graph_panel.place(x=515, y=130)
 
         # Run reset_lr function
         self.reset_lr() 
@@ -550,7 +554,7 @@ class LogReg(tk.Frame):
 
         # Add dropdown
         # Different types of penalty
-        pen_choices = ['l1', 'l2', 'elasticnet', 'none']
+        pen_choices = ['l1', 'l2', 'none']
 
         pen_choice = tk.StringVar(self)
 

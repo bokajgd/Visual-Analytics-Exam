@@ -5,11 +5,10 @@ import numpy as np # Matrix maths
 import matplotlib.pyplot as plt # For drawing graph
 from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import classification_report
-import keras
 
 
 # Function for plotting network graph
-# Function obtained from: https://gist.github.com/craffel/2d727968c3aaebd10359
+# Function obtained from: https://gist.github.com/craffel/2d727968c3aaebd10359 and then heavily edited
 def draw_neural_net(ax, left, right, bottom, top, layer_sizes):
     '''
     Draw a neural network cartoon using matplotilb.
