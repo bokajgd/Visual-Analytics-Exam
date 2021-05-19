@@ -1,12 +1,9 @@
-# Importing packages
-import os
-
+#-----# Importing packages #-----#
 from pathlib import Path
-import numpy as np
-import pandas as pd
 import cv2
 import argparse
-import matplotlib.pyplot as plt
+
+#-----# Project desctiption #-----#
 
 # Basic image processing using python
 '''
@@ -16,17 +13,30 @@ import matplotlib.pyplot as plt
 - Draw a green contour around each letter in the cropped image. Save this as image_letters.jpg
 ''' 
 
+#-----# Defining main function #-----#
+
 # Defining main function
 def main(args):
-    input_image = args.input
-    HistComparison(input_image = input_image) 
+    
+    # Setting input image to the input given in command line
+    input_image = args.inp
 
-# Setting class 'CountFunctions'
-class HistComparison:
+    # Creating class object
+    EdgeDetection(input_image = input_image) 
+
+#-----# Defining class #-----#
+class EdgeDetection:
+
     def __init__(self, input_image = None):
-        data_dir = self.setting_data_directory() # Setting data directory and root directory 
-        out_dir = self.setting_output_directory() # Setting output directory for the generated images
-        self.input_image = input_image # Setting input image
+        
+        # Setting data directory and root directory 
+        data_dir = self.setting_data_directory()
+        
+        # Setting output directory for the generated images
+        out_dir = self.setting_output_directory()
+        
+        # Setting input image
+        self.input_image = input_image
 
         # If target image is not specified, assign the fist image in folder as the target image as default
         if self.input_image is None:
@@ -37,6 +47,7 @@ class HistComparison:
 
         # Define target image file path
         input_image_filepath = data_dir / str(self.input_image)
+
         # Load image
         loaded_input_image = cv2.imread(str(input_image_filepath))
 
@@ -44,19 +55,19 @@ class HistComparison:
         ROI_image = cv2.rectangle(loaded_input_image.copy(), (1395, 880), (2854, 2778), (0, 255 ,0), 10) # Change values if you wish to analyse another image
 
         # Saving image 
-        cv2.imwrite("image_with_ROI.png", ROI_image)
+        cv2.imwrite(str(out_dir) + '/' + "image_with_ROI.png", ROI_image)
 
         # Creating cropped image only containing pixels inside defined ROI - Indexing is much easier than cv2 functions
         cropped_image = ROI_image[880:2778, 1395:2854] # Change  values if you wish to analyse another image
 
         # Saving image 
-        cv2.imwrite("only_ROI.png", cropped_image)
+        cv2.imwrite(str(out_dir) + '/' + "only_ROI.png", cropped_image)
 
         # Detecting edges and drawing contours around letters
         output_image = self.find_letters(cropped_image)
 
         # Saving image 
-        cv2.imwrite("image_with_contours.png", output_image)
+        cv2.imwrite(str(out_dir) + '/' + "image_with_contours.png", output_image)
 
 
     # Defining function for setting directory for the raw data
@@ -73,15 +84,12 @@ class HistComparison:
 
         root_dir = Path.cwd()  # Setting root directory
 
-        out_dir = root_dir  # Setting output data directory
+        out_dir = root_dir / 'output'  # Setting output data directory
 
         return out_dir
 
 
-    # Defining 
-
-
-    # Defining function for counting letters on an image
+    # Defining function for finding letters on an image
     '''
     Takes an input image, applies edge detection and return an output image with all conours
     Args:
@@ -115,16 +123,23 @@ class HistComparison:
                          3)
 
         return output_image
-
+    
 # Executing main function when script is run
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser()
+    #Create an argument parser from argparse
+    parser = argparse.ArgumentParser(description = "[INFO] Image similarity using color histograms",
+                                formatter_class = argparse.RawTextHelpFormatter)
 
-    parser.add_argument('--input',
-                        metavar="input",
+    # Creating argument variable for target image
+    parser.add_argument('-inp',
+                        metavar="--input",
                         type=str,
-                        help='Name of the file of the input image',
+                        help=
+                        "[DESCRIPTION] Name of the file of the input image \n"
+                        "[TYPE]        str \n"
+                        "[DEFAULT]     text_image.jpeg \n"
+                        "[EXAMPLE]     -inp text_image.jpeg",
                         required=False)           
 
     main(parser.parse_args())
