@@ -61,13 +61,13 @@ class EdgeDetection:
         cropped_image = ROI_image[880:2778, 1395:2854] # Change  values if you wish to analyse another image
 
         # Saving image 
-        cv2.imwrite(str(out_dir) + '/' + "only_ROI.png", cropped_image)
+        cv2.imwrite(str(out_dir) + '/' + "image_cropped.png", cropped_image)
 
         # Detecting edges and drawing contours around letters
         output_image = self.find_letters(cropped_image)
 
         # Saving image 
-        cv2.imwrite(str(out_dir) + '/' + "image_with_contours.png", output_image)
+        cv2.imwrite(str(out_dir) + '/' + "image_letters.png", output_image)
 
     #-----# Utility functions #-----#
 
