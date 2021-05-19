@@ -2,17 +2,13 @@
 
 # Import packages
 import numpy as np # Matrix maths
-import pandas as pd
-import tensorflow as tf # NN functions
 import matplotlib.pyplot as plt # For drawing graph
-from tensorflow.keras.models import Sequential # ANN Architecture
-from tensorflow.keras.layers import Dense # The layers in the ANN
 from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import classification_report
 import keras
-import os
-from pathlib import Path
 
+
+# Function for plotting network graph
 # Function obtained from: https://gist.github.com/craffel/2d727968c3aaebd10359
 def draw_neural_net(ax, left, right, bottom, top, layer_sizes):
     '''
@@ -57,6 +53,7 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes):
                 ax.add_artist(line)
 
 # Function for plotting model performance coeffiecnts
+# Code obtained from utils script from class
 def plot_coefs(coefficients, nclasses, name):
     """
     Plot the coefficients for each label
