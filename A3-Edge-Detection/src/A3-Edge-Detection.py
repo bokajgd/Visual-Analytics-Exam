@@ -43,7 +43,7 @@ class EdgeDetection:
 
             self.input_image = "text_image.jpeg"  # Setting default data directory
 
-            print(f"\Input image file name is not specified.\nSetting it to '{self.input_image}'.\n")
+            print(f"Input image file name is not specified.\nSetting it to '{self.input_image}'.\n")
 
         # Define target image file path
         input_image_filepath = data_dir / str(self.input_image)
@@ -69,6 +69,7 @@ class EdgeDetection:
         # Saving image 
         cv2.imwrite(str(out_dir) + '/' + "image_with_contours.png", output_image)
 
+    #-----# Utility functions #-----#
 
     # Defining function for setting directory for the raw data
     def setting_data_directory(self):
@@ -103,7 +104,7 @@ class EdgeDetection:
         
         # Blurring image for optimised detection
         blurred = cv2.GaussianBlur(grey_image, (7,7), 0)
-
+        
         # Applying thresholding (makes image black and white)
         _, image_bw = cv2.threshold(blurred, 115, 255, cv2.THRESH_BINARY)
 
@@ -120,7 +121,7 @@ class EdgeDetection:
                          contours,               
                          -1 , 
                          (0, 255, 0), # Making contours green
-                         3)
+                         2)
 
         return output_image
     
@@ -128,7 +129,7 @@ class EdgeDetection:
 if __name__ == '__main__':
     
     #Create an argument parser from argparse
-    parser = argparse.ArgumentParser(description = "[INFO] Image similarity using color histograms",
+    parser = argparse.ArgumentParser(description = "[INFO] Identifying Letters using Edge Detection ",
                                 formatter_class = argparse.RawTextHelpFormatter)
 
     # Creating argument variable for target image
