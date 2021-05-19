@@ -376,6 +376,11 @@ class MainApp(tk.Tk):
         pen = pen_choice.get() 
 
         tol = choose_tol.get() 
+        
+        # If tol is not given, set to default value of 0:
+        if tol is None:
+            
+            tol = 0
 
         # Split input into a list
         tol = float(tol)
