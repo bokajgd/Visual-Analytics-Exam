@@ -10,10 +10,10 @@ Edge detection refers to the notion of identifying boundary points in an image w
 <br> <br>
 More specifically, we were provided with a large image of a piece of text engraved onto the Jefferson memorial. The image can be found by clicking this link: <br> https://upload.wikimedia.org/wikipedia/commons/f/f4/%22We_Hold_These_Truths%22_at_Jefferson_Memorial_IMG_4729.JPG <br>
  The purpose is to detect and draw contours around each specific letter and language-like object (e.g. punctuation) in the image. The tasks were as follows (taken directly from assignment description): <br>
-•	Draw a green rectangular box to show a region of interest (ROI) around the main body of text in the middle of the image. Save this as **image_with_ROI.jpg**.
-•	Crop the original image to create a new image containing only the ROI in the rectangle. Save this as **image_cropped.jpg**.
-•	Using this cropped image, use Canny edge detection to 'find' every letter in the image
-•	Draw a green contour around each letter in the cropped image. Save this as **image_letters.jpg**
+•	Draw a green rectangular box to show a region of interest (ROI) around the main body of text in the middle of the image. Save this as **image_with_ROI.jpg**. <br>
+•	Crop the original image to create a new image containing only the ROI in the rectangle. Save this as **image_cropped.jpg**. <br>
+•	Using this cropped image, use Canny edge detection to 'find' every letter in the image <br>
+•	Draw a green contour around each letter in the cropped image. Save this as **image_letters.jpg** <br>
 
 # Usage
 See *General Instruction* in the home folder of the repository for instruction on how to clone the repo locally.
@@ -81,16 +81,13 @@ The following table explains the directory structure in more detail:
 |--------|:-----------|
 ```data```| A folder containing the data used for the analysis. In this folder, the image provided for analysis, *text_image.jpeg* is located.
 ```src``` | A folder containing the .py script (*A3-Edge-Detection.py*) created to solve the assignment.
-```output``` | A folder containing the output produced by the Python script. The script generates three images:
--	*image_with_ROI.png*: An image with a green border showing the pre-defined ROI
--	*image_letters.png*: An image with green contours drawn around all letters detected in the image
--	*image_cropped.png*: An image of only the ROI cropped out of the original image
+```output``` | A folder containing the output produced by the Python script. The script generates three images: <br> -	*image_with_ROI.png*: An image with a green border showing the pre-defined ROI <br> -	*image_letters.png*: An image with green contours drawn around all letters detected in the image <br> -	*image_cropped.png*: An image of only the ROI cropped out of the original image
 
 
 # Methods
 Akin to the script in assignment 2, the script is coded using the principles of object-oriented programming. See the first paragraph of the previous methods section for a quick outline of the general script architecture.<br>
 <br>
-All image processing in the script is performed using OpenCV (Bradski, 2000). After loading in the input image, a version with a green border drawn around the engravings is generated and saved in the output folder. This area is then cropped out of the original image which is also saved. In order to draw contours around the letters, the cropped image is converted into a greyscale color space. A Gaussian blur filter with a kernel size of 7x7 is then applied in order reduce noise in the image. If too much smoothing is induced, the desired edges will become undetectable. Next, the image is transformed using simple binary thresholding with a static threshold set at 115 (yields best result). This converts any pixels with a brightness value below 115 to 0 and pixels with a brightness value above 115 to 255. Lastly, canny edge detection is applied with a high threshold value of 30, a low threshold value of 150 and the kernel size set to the default 3x3. <br>
+All image processing in the script is performed using *OpenCV* (Bradski, 2000). After loading in the input image, a version with a green border drawn around the engravings is generated and saved in the output folder. This area is then cropped out of the original image which is also saved. In order to draw contours around the letters, the cropped image is converted into a greyscale color space. A Gaussian blur filter with a kernel size of 7x7 is then applied in order reduce noise in the image. If too much smoothing is induced, the desired edges will become undetectable. Next, the image is transformed using simple binary thresholding with a static threshold set at 115 (yields best result). This converts any pixels with a brightness value below 115 to 0 and pixels with a brightness value above 115 to 255. Lastly, canny edge detection is applied with a high threshold value of 30, a low threshold value of 150 and the kernel size set to the default 3x3. <br>
 <br>
 This enables drawing green contours around the letters. Only extreme outer contours are retrieved and a contour approximation method (*cv2.CHAIN_APPROX_SIMPLE*) is applied to compress the contours. The final image is the saved to the output folder.
 
