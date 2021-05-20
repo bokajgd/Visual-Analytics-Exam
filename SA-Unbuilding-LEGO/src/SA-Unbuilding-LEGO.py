@@ -1,9 +1,12 @@
 #-----# Importing packages #-----#
+from os import pathconf_names
 from pathlib import Path
 import cv2
 import numpy as np
 import argparse
 import random as rng
+from numpy.lib.function_base import percentile
+import tensorflow as tf
 
 #-----# Project desctiption #-----#
 
@@ -29,10 +32,10 @@ class BrickRecogniton:
     def __init__(self, input_creation = None):
         
         # Setting data directory and root directory 
-        data_dir = self.setting_data_directory()
+        self.data_dir = self.setting_data_directory()
         
         # Setting output directory for the generated images
-        out_dir = self.setting_output_directory()
+        self.out_dir = self.setting_output_directory()
         
         # Setting input image
         self.input_creation = input_creation
@@ -45,36 +48,53 @@ class BrickRecogniton:
             print(f"Input image file name is not specified.\nSetting it to '{self.input_creation}'.\n")
 
         # Define target image file path
-        input_creation_filepath = data_dir / 'creations' / str(self.input_creation)
+        input_creation_filepath = self.data_dir / 'creations' / str(self.input_creation)
 
         # Load image
         loaded_input_creation = cv2.imread(str(input_creation_filepath))
 
+        # Define path for pre-trained model
+        model_path = self.out_dir / 'model_outputs' / "lego-CNN.model"
+
+        # Load model
+        self.model = tf.keras.models.load_model(str(model_path)) 
+
         # Detecting edges and drawing contours around letters
         bbox_image, contour_image, bboxes = self.detect_bricks(loaded_input_creation)
 
-        bbox1 = self.extract_bbox(loaded_input_creation, bboxes[1])
+        # Creating header for final image 
+        real_and_predicted_bricks = np.zeros((200, 800, 3), dtype = "uint8")
 
-        # Resizing images to be 300 pixels wide
-        width = int(300)
-        height = int((300 / bbox1.shape[1]) * bbox1.shape[0])
+        # Adding header
+        cv2.putText(real_and_predicted_bricks, 'Unbuilding LEGO using', (100, 70), cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 255, 255), 2, cv2.LINE_AA)
 
-        # Resizing
-        bbox1 = cv2.resize(bbox1, (width, height))
+        cv2.putText(real_and_predicted_bricks, 'Object Detection and Deep Learning', (50, 135), cv2.FONT_HERSHEY_SIMPLEX, 1.25, (255, 255, 255), 2, cv2.LINE_AA)
 
-        # Background 
-        final_bbox1_image = np.zeros((400, 400, 3), dtype = "uint8")
+        # Loop through all extracted bboces
+        for i in range(len(bboxes)):
 
-        x_offset = int((400 - bbox1.shape[1])/2)
-        y_offset = int((400 - bbox1.shape[0])/2)
+            # Crop out the part of the original picture that is bounded by the bbox coordiantes
+            bbox = self.extract_bbox(loaded_input_creation, bboxes[i])
 
-        final_bbox1_image[y_offset:y_offset+bbox1.shape[0], x_offset:x_offset+bbox1.shape[1]] = bbox1
+            # Get image of brick on black background
+            brick_image = self.get_brick_image(bbox, i)
 
-        cv2.imwrite(str(out_dir) + '/' + "bricks_with_bboxes.png", bbox_image)
+            # Create a copy so image is not altered
+            image_for_prediction = brick_image.copy() 
+
+            # Run image through model to make prediction
+            prediction = self.predict_brick(image_for_prediction) 
+
+            # Merge cropped brick and example image of predicted brick into a collage
+            real_and_predicted_bricks = self.collate_predictions(real_and_predicted_bricks, prediction, brick_image, i) 
+
+        # Save images to output folder
+        cv2.imwrite(str(self.out_dir) + '/' + "bricks_with_bboxes.png", bbox_image)
         
-        cv2.imwrite(str(out_dir) + '/' + "bricks_with_contours.png", contour_image)
+        cv2.imwrite(str(self.out_dir) + '/' + "bricks_with_contours.png", contour_image)
 
-        cv2.imwrite(str(out_dir) + '/' + "bbox_image1.png", final_bbox1_image)
+        cv2.imwrite(str(self.out_dir) + '/' + "real_and_predicted_bricks.png", real_and_predicted_bricks)
+
 
     #-----# Utility functions #-----#
 
@@ -143,6 +163,7 @@ class BrickRecogniton:
 
         # Loop through all contours and draw them and their corresponting bounding box
         for i in range(len(sorted_contours)):
+
             bboxes[i] = cv2.boundingRect(sorted_contours[i])
             
             cv2.drawContours(bbox_image, sorted_contours, i, (0, 255, 0), 1)
@@ -163,7 +184,129 @@ class BrickRecogniton:
         bbox_image = input_image[ bbox[1]:(bbox[1]+bbox[3]), bbox[0]:(bbox[0]+bbox[2])]
 
         return bbox_image
+
+    # Defining function for generating and saving cropped bricks using extravted bboxes
+    def get_brick_image(self, bbox, i):
+        # Resizing image to be 300 pixels wide
+        width = int(300)
+
+        # Height is set according to ratio of how much the image was reduced in width
+        height = int((300 / bbox.shape[1]) * bbox.shape[0])
+
+        # Resizing
+        bbox = cv2.resize(bbox, (width, height))
+
+        # Creating black ackground 
+        final_bbox_image = np.zeros((400, 400, 3), dtype = "uint8")
+
+        # Calculating offsets in sides in order to place bbox image in middle of the black 400x400 frame
+        x_offset = int((400 - bbox.shape[1])/2)
+
+        y_offset = int((400 - bbox.shape[0])/2)
+
+        # Placing image
+        final_bbox_image[y_offset:y_offset+bbox.shape[0], x_offset:x_offset+bbox.shape[1]] = bbox
+
+        # Saving image of extracted brick
+        cv2.imwrite(str(self.out_dir) + '/detected_bricks/' + f"brick_number{i}.png", final_bbox_image)
+
+        return final_bbox_image
     
+    # Defining function for generating a prediction of the located brick using the pre-train cnn model
+    def predict_brick(self, model_input):
+
+        model_input = cv2.resize(model_input, (132, 132)) 
+
+        model_input  = model_input.reshape(-3, 132, 132, 3)
+        
+        prediction = self.model.predict([model_input])
+
+        return prediction
+
+    # Defining function for making a collage of the predicted bricks
+    def collate_predictions(self, real_and_predicted_bricks, prediction, brick_image, i):
+        
+        # Find predicted class and mere cropped image of brick in the creation with the example image of the predicted brick
+        if np.argmax(prediction) == 0:
+            
+            # Read example image
+            path_2x2_brick = self.data_dir / 'example_images' / 'Brick_2x2.png'
+
+            brick_2x2 = cv2.imread(str(path_2x2_brick))  
+            
+            # Add text lavbles
+            cv2.putText(brick_2x2, 'Predicted Brick', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.putText(brick_image, f'Brick_number_{i}', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            real_and_predicted_brick = np.concatenate((brick_image, brick_2x2), axis=1)
+        
+        if np.argmax(prediction) == 1:
+            
+            path_2x2_plate = self.data_dir / 'example_images' / 'Plate_2x2.png'
+
+            plate_2x2 = cv2.imread(str(path_2x2_plate))
+
+            cv2.putText(plate_2x2, 'Predicted Brick', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.putText(brick_image, f'Brick_number_{i}', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            real_and_predicted_brick = np.concatenate((brick_image, plate_2x2), axis=1)
+
+        if np.argmax(prediction) == 2:
+            
+            path_2x3_brick = self.data_dir / 'example_images' / 'Brick_2x3.png'
+
+            brick_2x3 = cv2.imread(str(path_2x3_brick))  
+            
+            cv2.putText(brick_2x3, 'Predicted Brick', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.putText(brick_image, f'Brick_number_{i}', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            real_and_predicted_brick = np.concatenate((brick_image, brick_2x3), axis=1)
+
+        if np.argmax(prediction) == 3:
+            
+            path_2x3_plate = self.data_dir / 'example_images' / 'Plate_2x3.png'
+
+            plate_2x3 = cv2.imread(str(path_2x3_plate))  
+            
+
+            cv2.putText(plate_2x3, 'Predicted Brick', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.putText(brick_image, f'Brick_number_{i}', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            real_and_predicted_brick = np.concatenate((brick_image, plate_2x3), axis=1)
+
+        if np.argmax(prediction) == 4:
+            
+            path_2x4_brick = self.data_dir / 'example_images' / 'Brick_2x4.png'
+
+            brick_2x4 = cv2.imread(str(path_2x4_brick))  
+            
+            cv2.putText(brick_2x4, 'Predicted Brick', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.putText(brick_image, f'Brick_number_{i}', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            real_and_predicted_brick = np.concatenate((brick_image, brick_2x4), axis=1)
+
+        if np.argmax(prediction) == 5:
+            
+            path_2x4_plate = self.data_dir / 'example_images' / 'Brick_2x4.png'
+
+            plate_2x4 = cv2.imread(str(path_2x4_plate))  
+
+            cv2.putText(plate_2x4, 'Predicted Brick', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            cv2.putText(brick_image, f'Brick_number_{i}', (80, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
+
+            real_and_predicted_brick = np.concatenate((brick_image, plate_2x4), axis=1)
+
+        # Vertically concatenating merged images with all other 'real_and_predicted_brick' images:
+        real_and_predicted_bricks = np.concatenate((real_and_predicted_bricks, real_and_predicted_brick), axis=0)
+
+        return real_and_predicted_bricks
+
 # Executing main function when script is run
 if __name__ == '__main__':
     
