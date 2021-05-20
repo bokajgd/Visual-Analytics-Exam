@@ -70,7 +70,7 @@ def cnn_mnist(n_layers, n_nodes):
         x_train,
         to_categorical(y_train), # E.g. 2 is transformed into [0, 0, 1, 0, ... 0]
         epochs = 3, # Number of iterations over the entire training dataset
-        batch_size = 65 # Number of samples per gradient update for training
+        batch_size = 64 # Number of samples per gradient update for training
     )
 
     # Evaluate the models
