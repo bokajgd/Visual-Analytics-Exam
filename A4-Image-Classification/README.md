@@ -73,7 +73,7 @@ The following table explains the directory structure in more detail:
 |--------|:-----------|
 ```graphics```| A folder containing *.gif* files of the background graphics.
 ```output``` | A folder containing the output produced by the when using the GUI. This includes a folder with trained CNN models, network graphs of the fully connected part of the CNN models, bar plot showing latest prediction on self-chosen image, visualisation of importance of input nodes in logistic regresision models.
-```src``` | A folder containing all the source code used for the project: <br> •	The *digit_classification_GUI.py *script contains the GUI code. <br> •	The *models* subfolder contains scripts for the logistic regression and convolutional neural network models that are utilised in by the GUI <br>    o	The *model_utils* subfolder contains a script with utility functions used in the model scripts
+```src``` | A folder containing all the source code used for the project: <br> •	The *digit_classification_GUI.py* script contains the GUI code. <br> •	The *models* subfolder contains scripts for the logistic regression and convolutional neural network models that are utilised in by the GUI <br>    o	The *model_utils* subfolder contains a script with utility functions used in the model scripts
 ```test_images```| This folder contains five test images that the user can use to test the *Classify New Image* function
 ```user_manual```| Contains all the images used for the user-manual
 
@@ -82,13 +82,16 @@ This section provides a brief walk-through of the structure of the GUI and intro
 <br>
 ![](user_manual/overview.png)
 <br>
+<br>
 When the GUI script is executed, a new window opens and the user lands on the **Start Page**:<br>
 <br>
 ![](user_manual/5a.png)
 <br>
+<br>
 From here, the user has the option of navigating to the **Convolutional Neural Network Page** or the **Logistic Regression Page**. E.g. when the ‘Neural Network’ button is pressed, one is redirected to the **Convolutional Neural Network Page**:<br>
 <br>
 ![](user_manual/5b.png)
+<br>
 <br>
 On this page, the user is able to design his/her own convolutional neural network by tweaking the number of layers and nodes in fully connected part of the network. 2 convolutional layers along with a max-pooling and a dropout at layers are pre-defined in the CNN model script and cannot be adjusted. The dropdown allows the user to choose between 1, 2 or 3 fully connected layers. The user then has to fill in the desired number of nodes for the respective layers. The number of nodes for each layer should be separated by a comma. Whenever the ‘Train and Evaluate’ button is pressed, the designed model starts training on the MNIST training data. All models are set to run through 3 epochs with a batch size of 64. Note that training takes a few minutes to complete, however, progress bars should appear in the terminal enabling the user to follow the process. Also note that a model will not initiate training if there is a discrepancy between number of chosen fully connected layer and the length of the list of number of nodes that are input.<br>
 <br>
@@ -96,21 +99,26 @@ When the model has finished training, its performance is tested on the test data
 <br>
 ![](user_manual/5c.png)
 <br>
+<br>
 Once a model has been trained and tested, the user has multiple options. He/she can either decide to reset the inputs and remove the plotted figures by pressing the ‘Reset’ button. He/she can also decide to return to the **Start Page** by clicking the ‘Start Page’ button. Lastly, the user can decide to proceed to a new page on which he/she can upload a self-chosen image file and let the most recently trained model make a prediction:<br>
 <br>
 ![](user_manual/5d.png)
+<br>
 <br>
 Here, the user can choose an image from his/her computer by pressing the ‘Choose Image’ button. The *test_images* folder in the assignment folder holds 5 images which the user can use as test images for prediction. Once an image has been chosen, the user can let the model make a prediction by pressing the ‘Classify’ button. The page shows both the uploaded image along with a bar plot and a label showing the digit prediction and prediction certainty. <br>
 <br>
 ![](user_manual/5e.png)
 <br>
+<br>
 By pressing the ‘Go Back’ button and then the ‘Start Page’ the user is redirected back to the start page. From here, the user can click the ‘Logistic Regression’ button and instead be redirected to the **Logistic Regression Page**: <br>
 <br>
 ![](user_manual/5f.png)
 <br>
+<br>
 On this page, the user is able to adjust the penalty and tolerance hyperparameters in a logistic regression classifier. The dropdown allows the user to implement either l1, l2 or no penalty. If either l1 or l2 penalty is chosen, the user should set the tolerance level (takes a float). The tolerance indicates the stopping criterion for the model when searching for optimal parameters. When the ‘Train and Evaluate’ button is pressed, the specified logistic regression model is trained and tested. Note that this may also take a minute or two. To minimise training time, the model only trains on 7500 images and is evaluated on a test set consisting of 2500 images.<br>
 <br>
 ![](user_manual/5g.png)
+<br>
 <br>
 After model training, a table showing the evaluation metrics is display along with a visualisation of the most important input nodes for each digit class.
 
@@ -129,6 +137,7 @@ The main purpose of this project was to create a user-friendly environment in wh
 The GUI also enables one to gain an insight into the workings and shortcomings of the two different algorithmic approaches. Despite its simplistic nature and shallow model structure, the logistic regression classifier is able to classify the handwritten digits with an accuracy of up to 92%. This benchmark is, however, greatly exceeded by the convolutional neural network which can be tweaked to performs with an accuracy above 98%. When training numerous models with varying it also becomes apparent that the. hyperparameters for the fully connected layers have minor influence on overall model performance and that all inputs within reasonable limits yields model performing with an accuracy around 98%. Though fully connected layers can influence a model when parameterized cleverly, for a simple network like this, most power lies in the convolutional layers (Basha et al., 2020).<br>
 <br>
 ![](user_manual/7.png)
+<br>
 <br>
 Lastly, the page on which the user can upload and test the model on a self-chosen image is ideal for examining how well models generalises to other images of handwritten digits. As seen in figure 5e, the model correctly predicts the digit with utmost certainty when faced with an image that is compositional identical to the images in the MNIST dataset. However, when faced with an image of a digit that is equally graspable to humans, but on e.g. a background with a different colour (as fan be seen in figure 7), the model is screwed and appears to be guessing at random. The MNIST dataset is extremely homogenous and, therefore, it is not able to generalise to images that have not been processed in the same manner.
 
