@@ -139,7 +139,7 @@ class legoCNN:
         )
 
         # Saving model
-        self.model.save(self.out_dir / f"lego-CNN_{self.epochs}_epochs.model") 
+        self.model.save(self.out_dir / f"lego-CNN.model") 
 
         # Evaluating model
         loss, acc = self.model.evaluate(self.test_data, verbose=1)

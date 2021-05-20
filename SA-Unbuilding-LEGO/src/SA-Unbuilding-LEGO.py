@@ -54,7 +54,7 @@ class BrickRecogniton:
         loaded_input_creation = cv2.imread(str(input_creation_filepath))
 
         # Define path for pre-trained model
-        model_path = self.out_dir / 'model_outputs' / "lego-CNN.model"
+        model_path = self.out_dir / 'model_outputs' / "lego-CNN_2_epochs.model"
 
         # Load model
         self.model = tf.keras.models.load_model(str(model_path)) 
