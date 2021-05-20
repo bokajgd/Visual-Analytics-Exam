@@ -89,11 +89,11 @@ class BrickRecogniton:
             real_and_predicted_bricks = self.collate_predictions(real_and_predicted_bricks, prediction, brick_image, i) 
 
         # Save images to output folder
-        cv2.imwrite(str(self.out_dir) + '/' + "bricks_with_bboxes.png", bbox_image)
+        cv2.imwrite(str(self.out_dir) + '/' + f"{self.input_creation[:len(self.input_creation)-4]}_bricks_with_bboxes.png", bbox_image)
         
-        cv2.imwrite(str(self.out_dir) + '/' + "bricks_with_contours.png", contour_image)
+        cv2.imwrite(str(self.out_dir) + '/' + f"{self.input_creation[:len(self.input_creation)-4]}_bricks_with_contours.png", contour_image)
 
-        cv2.imwrite(str(self.out_dir) + '/' + "real_and_predicted_bricks.png", real_and_predicted_bricks)
+        cv2.imwrite(str(self.out_dir) + '/' + f"{self.input_creation[:len(self.input_creation)-4]}_detected_vs_predicted_bricks.png", real_and_predicted_bricks)
 
 
     #-----# Utility functions #-----#
@@ -208,16 +208,20 @@ class BrickRecogniton:
         final_bbox_image[y_offset:y_offset+bbox.shape[0], x_offset:x_offset+bbox.shape[1]] = bbox
 
         # Saving image of extracted brick
-        cv2.imwrite(str(self.out_dir) + '/detected_bricks/' + f"brick_number{i}.png", final_bbox_image)
+        cv2.imwrite(str(self.out_dir) + '/detected_bricks/' + f"{self.input_creation[:len(self.input_creation)-4]}_brick_number{i}.png", final_bbox_image)
 
         return final_bbox_image
     
     # Defining function for generating a prediction of the located brick using the pre-train cnn model
     def predict_brick(self, model_input):
 
+        # Convert to grayscale
+        model_input = cv2.cvtColor(model_input, cv2.COLOR_BGR2GRAY)
+
+        # Rescaling and  reshaping before prediction
         model_input = cv2.resize(model_input, (132, 132)) 
 
-        model_input  = model_input.reshape(-3, 132, 132, 3)
+        model_input  = model_input.reshape(-1, 132, 132, 1)
         
         prediction = self.model.predict([model_input])
 

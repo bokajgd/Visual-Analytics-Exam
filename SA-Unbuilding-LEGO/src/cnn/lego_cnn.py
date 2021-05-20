@@ -23,6 +23,9 @@ class legoCNN:
         # Setting output directory
         self.out_dir = self.setting_output_directory()
 
+        # Setting output directory
+        self.data_dir = self.setting_data_directory()
+
         # Preproces data
         self.preprocess_data()  
 
@@ -48,55 +51,56 @@ class legoCNN:
 
         return out_dir
 
+    # Defining function for setting directory for the raw data
+    def setting_data_directory(self):
+
+        root_dir = Path.cwd()  # Setting root directory
+
+        data_dir = root_dir / 'data'  # Setting data directory
+
+        return data_dir
+
+    
+    # Defining a finction for loading and preprocesisng data
     def preprocess_data(self):
-        # Setting model output directory 
-        self.model_out_dir = Path.cwd()  / 'data' 
 
-        # Setting model data directory 
-        self.model_data_dir = Path.cwd() / 'data' 
-
-
-        self.train_data = tf.keras.preprocessing.image_dataset_from_directory(self.model_data_dir / 'train',
+        # Loading in data directly from folders and turning them grayscale
+        self.train_data = tf.keras.preprocessing.image_dataset_from_directory(self.data_dir / 'train',
                                                                             image_size=(132, 132),
-                                                                            batch_size=16)
+                                                                            batch_size=16,
+                                                                            color_mode='grayscale')
 
-        self.test_data = tf.keras.preprocessing.image_dataset_from_directory(self.model_data_dir / 'test',
+        self.test_data = tf.keras.preprocessing.image_dataset_from_directory(self.data_dir / 'test',
                                                                           image_size=(132, 132),
-                                                                          batch_size=16)
+                                                                          batch_size=16,
+                                                                          color_mode='grayscale')
 
         # Gettiing names of each class (brick names)
-        self.train_class_names = self.train_data.class_names
+        self.class_names = self.train_data.class_names
 
-        train_classes = open(str(self.out_dir) + "/train_classes.txt", "w")
+        name_of_classes = open(str(self.out_dir) + "/name_of_classes.txt", "w")
 
-        train_classes.write(str(self.train_class_names))
+        name_of_classes.write(str(self.class_names))
         
-        train_classes.close()
-        
-        self.test_class_names = self.test_data.class_names
-
-        test_classes = open(str(self.out_dir) + "/test_classes.txt", "w")
-
-        test_classes.write(str(self.test_class_names))
-        
-        test_classes.close()
+        name_of_classes.close()
 
         # Number of classes
-        self.num_classes = len(self.train_class_names)
+        self.num_classes = len(self.class_names)
 
 
     # Defining cnn in a single function
     def build_model(self):
         
         # Image input shape
-        input_shape = (132, 132, 3)
+        input_shape = (132, 132, 1)
 
         # Build the model
         self.model = keras.models.Sequential()
 
+        # Compressing numbers into a smaller vectorspace for better convergences
         self.model.add(keras.layers.experimental.preprocessing.Rescaling(1. / 255, input_shape=input_shape))
 
-        self.model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu'))
+        self.model.add(keras.layers.Conv2D(32, kernel_size=(5, 5), activation='relu'))
 
         self.model.add(keras.layers.Conv2D(64, (3, 3), activation='relu'))
 
@@ -135,7 +139,7 @@ class legoCNN:
         )
 
         # Saving model
-        self.model.save(self.out_dir / f"lego-CNN.model") 
+        self.model.save(self.out_dir / f"lego-CNN_{self.epochs}_epochs.model") 
 
         # Evaluating model
         loss, acc = self.model.evaluate(self.test_data, verbose=1)
@@ -170,7 +174,7 @@ class legoCNN:
         plt.legend()
         
         plt.tight_layout()
-        out_file = self.out_dir / "train_val_history.png"
+        out_file = self.out_dir / f"train_val_history_{self.epochs}_epochs.png"
 
         plt.savefig(out_file)
 
