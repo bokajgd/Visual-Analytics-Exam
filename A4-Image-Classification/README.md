@@ -73,7 +73,7 @@ The following table explains the directory structure in more detail:
 |--------|:-----------|
 ```graphics```| A folder containing *.gif* files of the background graphics.
 ```output``` | A folder containing the output produced by the when using the GUI. This includes a folder with trained CNN models, network graphs of the fully connected part of the CNN models, bar plot showing latest prediction on self-chosen image, visualisation of importance of input nodes in logistic regresision models.
-```src``` | A folder containing all the source code used for the project: <br> •	The *digit_classification_GUI.py* script contains the GUI code. <br> •	The *models* subfolder contains scripts for the logistic regression and convolutional neural network models that are utilised in by the GUI <br>    o	The *model_utils* subfolder contains a script with utility functions used in the model scripts
+```src``` | A folder containing all the source code used for the project: <br> •	The *digit_classification_GUI.py* script contains the GUI code. <br> •	The *models* subfolder contains scripts for the logistic regression and convolutional neural network models that are utilised in by the GUI <br>    -	The *model_utils* subfolder contains a script with utility functions used in the model scripts
 ```test_images```| This folder contains five test images that the user can use to test the *Classify New Image* function
 ```user_manual```| Contains all the images used for the user-manual
 
