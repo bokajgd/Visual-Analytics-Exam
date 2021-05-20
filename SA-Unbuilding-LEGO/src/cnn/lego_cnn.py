@@ -1,125 +1,115 @@
-# Classifying the MNIST handwritten digits (0-9)
+# Classifying impressionist paintings by painter
 
 # Import packages
+import numpy as np # Matrix maths
+import tensorflow as tf # NN functions
 import matplotlib.pyplot as plt # For drawing graph
-from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import classification_report
 import keras
+
 from pathlib import Path
 
-# Import utility functions definied in utils.py
-from models.model_utils.utils import draw_neural_net
 
-# Defining cnn in a single function - the function takes arguments 'n_layers' and 'n_nodes' which are provided by GUI user
-def cnn_mnist(n_layers, n_nodes):
-
-    # Setting model output directory 
-    model_out_dir = Path.cwd() / 'output' 
-
-    # Load data
-    mnist = keras.datasets.mnist
-
-    # Split data into train and test
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-
-    # Normalizing the images / normalize the pixels values to values between [-0.5 ; 0.5]
-    # This gives best conditions for parameters optimisation
-    x_train = (x_train/255) - 0.5 
-
-    x_test = (x_test/255) - 0.5
-
-    # Flatting the images / Flatten from 28x28 matrix to 1x784 dimensional column vector
-    x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
-
-    x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
+# Defining main function
+def main():
     
-    input_shape = (28, 28, 1)
+    # Instantiate class
+    cnn = legoCNN()
 
-    # Build the convolutional layers of the model + pooling layers and dropout
-    model = keras.models.Sequential()
+    cnn.preprocess_data()  # Preproces data
+    cnn.build_model() # Build model  
+    cnn.train_and_evaluate() # Train and evaluate model
 
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu',
-                                input_shape=input_shape))
+# Defining class
+class legoCNN:
+    def __init__(self):
+        return
 
-    model.add(keras.layers.Conv2D(64, (3, 3), activation='relu'))
+    def preprocess_data(self):
+        # Setting model output directory 
+        self.model_out_dir = Path.cwd()  / 'data' 
 
-    model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(keras.layers.Dropout(0.25))
-
-    model.add(keras.layers.Flatten())
-
-    # Let user define hyperparams of fully connected layers
-    # Add dense layers with the dimensions according to input by user
-    for layer in range(n_layers):
-
-        model.add(keras.layers.Dense(n_nodes[layer], activation='relu'))
-
-    model.add(keras.layers.Dense(10, activation='softmax'))
-
-    # Compile the layers into one model
-    # Loss function and optimizer needed
-    model.compile(
-        optimizer = 'adam',
-        loss = 'categorical_crossentropy', # This allows more than two classes
-        metrics = ['accuracy']
-    )
-
-    # Train the model
-    model.fit(
-        x_train,
-        to_categorical(y_train), # E.g. 2 is transformed into [0, 0, 1, 0, ... 0]
-        epochs = 3, # Number of iterations over the entire training dataset
-        batch_size = 65 # Number of samples per gradient update for training
-    )
-
-    # Evaluate the models
-    model.evaluate(
-        x_test,
-        to_categorical(y_test)
-    )
-
-    # Saving evaluation metrics
-    predictions = model.predict(x_test)
-
-    predictions = predictions.argmax(axis=1)
-
-    cm = classification_report(to_categorical(y_test).argmax(axis=1), predictions)
-
-    # Saving figure
-    nodes_str = str(n_nodes).replace('[','').replace(']','').replace(' ', '')
-
-    model.save(model_out_dir / f"{n_layers}-dense-{nodes_str}-nodes-CNN.model") 
-
-    # Visualising network
-
-    # Styling title
-    title = {'family': 'serif',
-            'color': '#4A5B65',
-            'weight': 'normal',
-            'size': 24,
-            }
-
-    # Creating full network structure by adding the dimension of the output layer
-    network_structure = n_nodes + [10] 
-    
-    # Creating figure
-    fig = plt.figure(figsize=(7, 7)) 
-
-    ax = fig.gca()
-
-    ax.axis('off')
-
-     # Running visualisation function
-    draw_neural_net(ax, .1, .9, .1, .9, network_structure)
-     
-    # Setting unique titlie
-    ax.set_title(f"{n_layers}-dense-{n_nodes}-nodes-CNN", fontdict = title, y = 0.9)
-
-    # Saving figure
-    plt.savefig(model_out_dir / f"{n_layers}-dense-{nodes_str}-nodes-CNN-viz.png") 
-
-    # Return results
-    return cm
+        # Setting model data directory 
+        self.model_data_dir = Path.cwd() / 'data' 
 
 
+        self.train_data = tf.keras.preprocessing.image_dataset_from_directory(self.model_data_dir / 'train',
+                                                                            image_size=(132, 132),
+                                                                            batch_size=16)
+
+        self.test_data = tf.keras.preprocessing.image_dataset_from_directory(self.model_data_dir / 'test',
+                                                                          image_size=(132, 132),
+                                                                          batch_size=16)
+
+        # Preprocessing data for evaluation and classification report
+        self.test_images = np.concatenate([images for images, labels in self.test_data], axis=0)
+
+        self.test_labels = np.concatenate([labels for images, labels in self.test_data], axis=0)
+
+        # Gettiing names of each class (brick names)
+        self.train_class_names = self.train_data.class_names
+
+        self.test_class_names = self.test_data.class_names
+
+        # Number of classes
+        self.num_classes = len(self.train_class_names)
+
+
+    # Defining cnn in a single function
+    def build_model(self):
+        
+        # Image input shape
+        input_shape = (132, 132, 3)
+
+        # Build the model
+        self.model = keras.models.Sequential()
+
+        self.model.add(keras.layers.experimental.preprocessing.Rescaling(1. / 255, input_shape=input_shape))
+
+        self.model.add(keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu'))
+
+        self.model.add(keras.layers.Conv2D(64, (3, 3), activation='relu'))
+
+
+        self.model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
+
+        self.model.add(keras.layers.Dropout(0.25))
+
+        self.model.add(keras.layers.Flatten())
+
+        self.model.add(keras.layers.Dense(32, activation='relu'))
+
+        self.model.add(keras.layers.Dense(16, activation='relu'))
+
+        self.model.add(keras.layers.Dense(self.num_classes, activation='softmax'))
+
+        # Compile the layers into one model
+        # Loss function and optimizer needed (using SparseCategoricalCrossentropy and Adam)
+        self.model.compile(
+            optimizer = 'adam',
+            loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), # This allows more than two classes
+            metrics = ['accuracy']
+        )
+
+        print(self.model.summary())
+
+    # Defining function for trainings
+    def train_and_evaluate(self):
+        # Train the model
+        self.model.fit(
+            self.train_data,
+            validation_data=self.test_data, 
+            epochs = 4, # Number of iterations over the entire training dataset
+        )
+
+        # Saving evaluation metrics
+        predictions = self.model.predict(self.test_images, batch_size=16)
+        eval_report = classification_report(self.test_labels,
+                                            predictions.argmax(axis=1),
+                                            target_names=self.val_class_names)
+
+        print(eval_report)
+
+# Executing main function when script is run
+if __name__ == '__main__':   
+    main()

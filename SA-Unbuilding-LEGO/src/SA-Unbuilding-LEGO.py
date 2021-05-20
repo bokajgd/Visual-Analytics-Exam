@@ -53,10 +53,28 @@ class BrickRecogniton:
         # Detecting edges and drawing contours around letters
         bbox_image, contour_image, bboxes = self.detect_bricks(loaded_input_creation)
 
-        # Saving images 
+        bbox1 = self.extract_bbox(loaded_input_creation, bboxes[1])
+
+        # Resizing images to be 300 pixels wide
+        width = int(300)
+        height = int((300 / bbox1.shape[1]) * bbox1.shape[0])
+
+        # Resizing
+        bbox1 = cv2.resize(bbox1, (width, height))
+
+        # Background 
+        final_bbox1_image = np.zeros((400, 400, 3), dtype = "uint8")
+
+        x_offset = int((400 - bbox1.shape[1])/2)
+        y_offset = int((400 - bbox1.shape[0])/2)
+
+        final_bbox1_image[y_offset:y_offset+bbox1.shape[0], x_offset:x_offset+bbox1.shape[1]] = bbox1
+
         cv2.imwrite(str(out_dir) + '/' + "bricks_with_bboxes.png", bbox_image)
         
         cv2.imwrite(str(out_dir) + '/' + "bricks_with_contours.png", contour_image)
+
+        cv2.imwrite(str(out_dir) + '/' + "bbox_image1.png", final_bbox1_image)
 
     #-----# Utility functions #-----#
 
@@ -81,11 +99,14 @@ class BrickRecogniton:
 
     # Defining function for finding each brick on the image
     '''
-    Takes an input image, applies edge detection and returns an output image with all conours
+    Takes an input image, applies edge detection and returns an image with contours drawn, 
+    an image with bboxes drawn and a list of bbox coordinates for all seperate bricks
     Args:
-        input_image: Input image
+        input_image : (img) Input image
     Returns:
-        output_image: Output image with drawn contours
+        bbox_image : (img) Output image with bboxes drawn around bricks
+        contour_image : (img) Output image with only contours drawn around bricks
+        bboxes : (list) list of coordinates for each bounding box
     '''
     def detect_bricks(self, input_image):
         # Transform input into hsv space
@@ -134,6 +155,14 @@ class BrickRecogniton:
             (int(bboxes[i][0]+bboxes[i][2]), int(bboxes[i][1]+bboxes[i][3])), colour, 3)
 
         return bbox_image, contour_image, bboxes
+
+    # Defining functiong for cropping out bbox from origianl image
+    def extract_bbox(self, input_image, bbox):
+        
+        # Crop out bbox from original image
+        bbox_image = input_image[ bbox[1]:(bbox[1]+bbox[3]), bbox[0]:(bbox[0]+bbox[2])]
+
+        return bbox_image
     
 # Executing main function when script is run
 if __name__ == '__main__':
