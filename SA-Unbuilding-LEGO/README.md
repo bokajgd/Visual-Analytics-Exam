@@ -93,7 +93,7 @@ The following table explains the directory structure in more detail:
 |--------|:-----------|
 ```data```| A folder containing the data used for the project. <br> •	The *creations* subfolder contains the image of the LEGO snake, *snake.png* (Built using Bricklink Studio 2.0) <br> •	The e*xample_image*s subfolder contains standard images of each of the 6 types of bricks that the classifier has been trained on <br> •	The *test* and *train* folders respectively hold the test (480 images) and train (4.200 images)
 ```src``` | A folder containing the source code for the project. <br> •	*SA-Unbuilding-LEGO.py* is the main script<br> •	The *cnn* folder contains the script for training and evaluating a cnn model on the train and test data
-```output``` | A folder containing the output produced by the Python scripts: <br> •	*detected_bricks*: This subfolder holds 400x400 pixel images of the individual detected bricks found in the analysed LEGO model on a black background to match the images from the data set <br> •	model_outputs: The subfolder holds outputs from the *legoCNN.py* script.<br>    o	*lego-CNN_2_epochs.model* folder contains pre-trained model <br>    o	*train_val_history_2_epochs.png* shows model training development over 2 epochs<br>    o	*name_of_classes.txt* holds a chronological list of the names of the brick types that the classifier can predict<br> •	s*nake_bricks_with_bboxes.png* shows the input image of the snake with bounding boxes drawn around the individual bricks <br> •	*snake_bricks_with_contours.png* shows the input image of the snake with contours drawn around the edges of the individual bricks<br> •	*snake_detected_vs_predicted_bricks.png* is a collage showing the classifier predictions for each of the detected bricks
+```output``` | A folder containing the output produced by the Python scripts: <br> •	*detected_bricks*: This subfolder holds 400x400 pixel images of the individual detected bricks found in the analysed LEGO model on a black background to match the images from the data set <br> •	model_outputs: The subfolder holds outputs from the *legoCNN.py* script.<br>      o	*lego-CNN_2_epochs.model* folder contains pre-trained model <br>      o	*train_val_history_2_epochs.png* shows model training development over 2 epochs<br>      o	*name_of_classes.txt* holds a chronological list of the names of the brick types that the classifier can predict<br> •	s*nake_bricks_with_bboxes.png* shows the input image of the snake with bounding boxes drawn around the individual bricks <br> •	*snake_bricks_with_contours.png* shows the input image of the snake with contours drawn around the edges of the individual bricks<br> •	*snake_detected_vs_predicted_bricks.png* is a collage showing the classifier predictions for each of the detected bricks
 
 
 
@@ -107,23 +107,23 @@ The S*A-Unbuilding-LEGO.py *is built up around the same core object-oriented str
 # Discussion of Results
 Figure 7 shows the resulting brick segmentation when running the LEGO snake through the tool. This aspect works remarkably well and all of the bricks end up being outline by a tight bounding box. The edge detection steps enabled the fine-grained drawing of two discrete thin lines on both sides of the dark edges that separate the individual bricks and this entails that each brick is fully surrounded by a distinct contour. <br>
 ### Imageg of segmented bricks
-![](output/snake_bricks_with_contours.png.png)
+![](output/snake_bricks_with_contours.png)
 <br>
 <br>
 ![](output/snake_bricks_with_bboxes.png)
 <br>
 <br>
-![](snake_detected_vs_predicted_bricks.png)
+![](output/snake_detected_vs_predicted_bricks.png)
 <br>
 <br>
 Let’s redirect our attention towards the performance of the classifier. Figure 9 shows the models performance metrics developments across multiple epochs. After two epochs, the validation accuracy has already stagnated while the train accuracy proceeds to increase, and the train loss drastically drops. This indicates that the model is starting to overfit, and it 
 is best to halt the parameter search here. This may appear alarming at first but is important to keep in mind that the training data for each brick category solely consists of renderings of the same brick taken at different angles and therefore it is foreseeable the overfitting could quickly arise.  
 <br>
 <br>
-From *figure 9 *it can also be observed that the validation accuracy starts off higher than the training accuracy. This may seem peculiar at first, but it most likely due to the dropout noise that is applied during model training but during inference.
+From *figure 9* it can also be observed that the validation accuracy starts off higher than the training accuracy. This may seem peculiar at first, but it most likely due to the dropout noise that is applied during model training but during inference.
 <br>
 <br>
-![](train_val_history_2_epochs.png)
+![](output/train_val_history_2_epochs.png)
 <br>
 <br>
 The trained CNN model yields an overall accuracy of 77% on the test data which seems to be decent under the circumstances. Figure 10 shows how well the model has performed at correctly classifying the bricks identified in the LEGO snake. Here, it is apparent that only two (brick no. 1 and no. 3) out of seven bricks are predicted spot-on by the model. This clearly suggests that the tool is still highly faulty even when tested on the most simplistic LEGO models. Two out of seven is, nonetheless, still better than chance and it is also worth noting that all bricks are correctly identified as bricks. Akin to the problems faced when training a simple digit classifier on the MNIST, this LEGO classifier is trained on an extremely homogenous dataset, and it is therefore expected that it generalises very poorly when faced with unfamiliar data. A robust model would as a minimum need a much more comprehensive data set of labelled images of LEGO bricks in many different settings.
